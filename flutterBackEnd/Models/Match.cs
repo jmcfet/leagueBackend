@@ -13,6 +13,6 @@ namespace flutterBackEnd.Models
         public int skillLevel { get; set; }
         public int spare { get; set; }
         public String captain { get; set; }
-        public String players { get; set; }
+        public virtual List<ApplicationUser> players { get; set; }
     }
 }

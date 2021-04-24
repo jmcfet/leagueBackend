@@ -13,7 +13,10 @@ namespace flutterBackEnd.Models
     {
         public int skillLevel { get; set; }
         public int timesCaptain { get; set; }
-        public virtual List< BookedDates> bookedDates {get;set; }
+        public int bFreezeDB { get; set; }
+        public string  memberName { get; set; }
+        public virtual List<BookedDates> bookedDates { get; set; }
+        public virtual List<Match> Matches { get; set; }
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager, string authenticationType)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
@@ -27,6 +30,7 @@ namespace flutterBackEnd.Models
     {
         public DbSet<BookedDates> statusforDays { get; set; }
         public DbSet<Match> matchs { get; set; }
+        public DbSet<ClubMember> members { get; set; }
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)
         {
@@ -47,5 +51,5 @@ namespace flutterBackEnd.Models
         //}
 
     }
-    
+
 }

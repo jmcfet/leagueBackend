@@ -323,11 +323,52 @@
     <Compile Include="Migrations\202104011516129_addbookeddatesuserasvirtual.Designer.cs">
       <DependentUpon>202104011516129_addbookeddatesuserasvirtual.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\202104012040289_addclubmember.cs" />
+    <Compile Include="Migrations\202104012040289_addclubmember.Designer.cs">
+      <DependentUpon>202104012040289_addclubmember.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202104021816512_addmanytomanymatchtouser.cs" />
+    <Compile Include="Migrations\202104021816512_addmanytomanymatchtouser.Designer.cs">
+      <DependentUpon>202104021816512_addmanytomanymatchtouser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202104072011408_onemanyusertostatusmonth.cs" />
+    <Compile Include="Migrations\202104072011408_onemanyusertostatusmonth.Designer.cs">
+      <DependentUpon>202104072011408_onemanyusertostatusmonth.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202104072031176_onemanyusertostatusmonthfix.cs" />
+    <Compile Include="Migrations\202104072031176_onemanyusertostatusmonthfix.Designer.cs">
+      <DependentUpon>202104072031176_onemanyusertostatusmonthfix.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202104072246479_restorestatusfordays.cs" />
+    <Compile Include="Migrations\202104072246479_restorestatusfordays.Designer.cs">
+      <DependentUpon>202104072246479_restorestatusfordays.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202104080205044_changebookdatesid.cs" />
+    <Compile Include="Migrations\202104080205044_changebookdatesid.Designer.cs">
+      <DependentUpon>202104080205044_changebookdatesid.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202104080231342_restore.cs" />
+    <Compile Include="Migrations\202104080231342_restore.Designer.cs">
+      <DependentUpon>202104080231342_restore.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202104081625162_addfrezzecolumn.cs" />
+    <Compile Include="Migrations\202104081625162_addfrezzecolumn.Designer.cs">
+      <DependentUpon>202104081625162_addfrezzecolumn.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202104081632529_addfrezzecolumn1.cs" />
+    <Compile Include="Migrations\202104081632529_addfrezzecolumn1.Designer.cs">
+      <DependentUpon>202104081632529_addfrezzecolumn1.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\202104241457257_adduserid.cs" />
+    <Compile Include="Migrations\202104241457257_adduserid.Designer.cs">
+      <DependentUpon>202104241457257_adduserid.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\BookedDates.cs" />
     <Compile Include="Models\BookedDatesDTO.cs" />
+    <Compile Include="Models\ClubMember.cs" />
     <Compile Include="Models\datesandStatus.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Match.cs" />
@@ -457,6 +498,36 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\202104011516129_addbookeddatesuserasvirtual.resx">
       <DependentUpon>202104011516129_addbookeddatesuserasvirtual.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104012040289_addclubmember.resx">
+      <DependentUpon>202104012040289_addclubmember.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104021816512_addmanytomanymatchtouser.resx">
+      <DependentUpon>202104021816512_addmanytomanymatchtouser.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104072011408_onemanyusertostatusmonth.resx">
+      <DependentUpon>202104072011408_onemanyusertostatusmonth.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104072031176_onemanyusertostatusmonthfix.resx">
+      <DependentUpon>202104072031176_onemanyusertostatusmonthfix.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104072246479_restorestatusfordays.resx">
+      <DependentUpon>202104072246479_restorestatusfordays.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104080205044_changebookdatesid.resx">
+      <DependentUpon>202104080205044_changebookdatesid.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104080231342_restore.resx">
+      <DependentUpon>202104080231342_restore.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104081625162_addfrezzecolumn.resx">
+      <DependentUpon>202104081625162_addfrezzecolumn.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104081632529_addfrezzecolumn1.resx">
+      <DependentUpon>202104081632529_addfrezzecolumn1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\202104241457257_adduserid.resx">
+      <DependentUpon>202104241457257_adduserid.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

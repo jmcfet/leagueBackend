@@ -12,6 +12,7 @@ namespace flutterBackEnd.Models
         public int day { get; set; }
         public int level { get; set; }
         public String Captain { get; set; }
+        //      public List<String> players { get; set; }
         public List<String> players { get; set; }
-    }
+}
 }
