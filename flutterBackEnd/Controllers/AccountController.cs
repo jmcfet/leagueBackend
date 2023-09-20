@@ -18,11 +18,19 @@ using flutterBackEnd.Providers;
 using flutterBackEnd.Results;
 using System.Linq;
 using System.Data.Entity;
+using System.Net.Mail;
 /*  important we must enable cors seperately for the Token endpoint as enabling all at startup is NOT good enough 
 *  we must add the following line 
 *  And inside GrantResourceOwnerCredentials method:    in applicationOauthProvider.cs
 
 context.OwinContext.Response.Headers.Add("Access-Control-Allow-Origin", new[] { "*" }); 
+
+when I moved everything to winhost the tables were not automatically created I had to
+From Package Manager Console
+
+Enable-Migrations -Force
+Add-Migration init
+Update-Database
 */
 namespace flutterBackEnd.Controllers
 {
@@ -59,7 +67,7 @@ namespace flutterBackEnd.Controllers
 
         public ISecureDataFormat<AuthenticationTicket> AccessTokenFormat { get; private set; }
 
-        
+
 
         // POST api/Account/Logout
         [Route("Logout")]
@@ -120,7 +128,7 @@ namespace flutterBackEnd.Controllers
 
             IdentityResult result = await UserManager.ChangePasswordAsync(User.Identity.GetUserId(), model.OldPassword,
                 model.NewPassword);
-            
+
             if (!result.Succeeded)
             {
                 return GetErrorResult(result);
@@ -253,9 +261,9 @@ namespace flutterBackEnd.Controllers
             if (hasRegistered)
             {
                 Authentication.SignOut(DefaultAuthenticationTypes.ExternalCookie);
-                
-                 ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(UserManager,
-                    OAuthDefaults.AuthenticationType);
+
+                ClaimsIdentity oAuthIdentity = await user.GenerateUserIdentityAsync(UserManager,
+                   OAuthDefaults.AuthenticationType);
                 ClaimsIdentity cookieIdentity = await user.GenerateUserIdentityAsync(UserManager,
                     CookieAuthenticationDefaults.AuthenticationType);
 
@@ -276,112 +284,166 @@ namespace flutterBackEnd.Controllers
 
         [Route("StatusOfDaysinMonth")]
         [HttpPost]
-        public IHttpActionResult StatusOfDaysinMonth([FromUri]String month, [FromUri]string EMail, [FromBody]datesandStatusDTO values)
+        public IHttpActionResult StatusOfDaysinMonth([FromUri] String month, [FromUri] String year, [FromUri] string EMail, [FromBody] datesandStatusDTO values)
         //      public IHttpActionResult StatusOfDaysinMonth(datesandStatusDTO values)
         {
+            //there can only be one set of bookeddates for the user for the month
+            BookedDates booked = null;
+            bool bAdd = false;
+            int mon = Int32.Parse(month);
+            int year1 = Int32.Parse(year);
+            ApplicationUser user = db.Users.Include(u => u.bookedDates).Where(u => u.Email == EMail).SingleOrDefault();
+            if (user.bookedDates == null)
+            {
+                user.bookedDates = new List<BookedDates>();
+                booked = new BookedDates();
+                bAdd = true;
+            }
+            else
+            {
+                booked = user.bookedDates.Where(b => b.month == mon && b.year == year1).SingleOrDefault();
+                if (booked == null)
+                {
+                    booked = new BookedDates();
+                    bAdd = true;
+                }
 
-            ApplicationUser user = db.Users.Where(u => u.Email == EMail).SingleOrDefault();
-            BookedDates booked = new BookedDates();
-            booked.month = Int32.Parse(month); 
+            }
+            booked.month = mon;
+            booked.year = year1;
             booked.status = "";
             int count = values.status[0];
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i <= count; i++)
             {
                 booked.status = booked.status + values.status[i] + ",";
 
             }
             booked.user = user;
-            db.statusforDays.Add(booked);
+            if (bAdd)
+                db.statusforDays.Add(booked);
             db.SaveChanges();
             return Ok();
         }
-        // GET api/Account/getMonthStatus
+        // GET api/Account/getMonthStatus  
+        //get all the bookings for the month in the year for all user
         [AllowAnonymous]
         [Route("GetMonthStatus")]
-        public List<BookedDatesDTO > GetMonthStatus(string month)
+        public List<BookedDatesDTO> GetMonthStatus([FromUri] string month)
+        {
+
+            string year = "2023";
+            int m = Int32.Parse(month);
+            int year1 = Int32.Parse(year);
+            List<BookedDates> status = db.statusforDays.Where(i => i.month == m && i.year == year1).ToList();
+            List<BookedDatesDTO> dtos = new List<BookedDatesDTO>();
+            for (int j = status.Count()-1; j >= 0; j--)
+            {
+                BookedDatesDTO dup = dtos.Where(d => d.user.userid == status[j].user.UserName).SingleOrDefault();
+                if (dup != null)
+                    continue;
+            
+                BookedDatesDTO dto = new BookedDatesDTO
+                {
+                    
+                    id = j,
+                    month = m,
+                    status = status[j].status,
+                    isCaptain = false,
+                    user = new userdto()
+                    {
+                        level = status[j].user.skillLevel,
+                        timesCaptain = status[j].user.timesCaptain,
+                        notused = status[j].user.AccessFailedCount,
+                        userid = status[j].user.UserName,
+                        Name = status[j].user.memberName,
+                        isFrozen = status[j].user.bFreezeDB,
+                        phonenum = status[j].user.PhoneNumber,
+                        Email = status[j].user.Email
+                    }
+
+                };
+     //           string[] nameParts =  dto.user.Name.Trim().Split(' ');
+     //           dto.user.Name = nameParts[nameParts.Length - 1] + nameParts[0];
+                dtos.Add(dto);
+
+            }
+            dtos.Sort((x,y)=> x.user.Name.CompareTo(y.user.Name));
+            return dtos;
+        }
+        [AllowAnonymous]
+        [Route("GetMonthStatusforUser")]
+        public BookedDatesDTO GetMonthStatusforUser([FromUri] string month, [FromUri] string year, [FromUri] string email)
         {
 
 
             int m = Int32.Parse(month);
-            List<BookedDates> status = db.statusforDays.Where(i => i.month == m).ToList();
-            List<BookedDatesDTO> dtos = new List<BookedDatesDTO>();
-            for (int j = 0; j < status.Count(); j++)
+            int year1 = Int32.Parse(year);
+            ApplicationUser user = db.Users.Include(u => u.bookedDates).Where(u => u.Email == email).SingleOrDefault();
+            BookedDates status = user.bookedDates.Where(i => i.month == m && i.year == year1).SingleOrDefault();
+            if (status != null)
             {
                 BookedDatesDTO dto = new BookedDatesDTO
                 {
-                    id = j,
-                    Name = status[j].user.UserName,
+                    id = 1,
+                    //                memberName = status.user.memberName,
                     month = m,
-                    level = status[j].user.skillLevel,
+                    year = year1,
+                    //               level = status.user.skillLevel,
                     isCaptain = false,
-                    numTimesCaptain = status[j].user.timesCaptain,
-                    status = status[j].status
+                    status = status.status
 
 
                 };
-                dtos.Add(dto);
-
+                return dto;
             }
-            return dtos;
+
+            return null;
         }
-        // GET api/Account/getMonthStatus
-        [AllowAnonymous]
-        [Route("GetPlayersinMatch")]
-        public String  GetPlayersinMatch(String Name,String day1)
-        {
-            int day = Int32.Parse(day1);
-            List<Match> matchesforday = db.matchs.Where(m => m.day == day).ToList();
-            //foreach(Match match in matchesforday)
-            //{
-            //    if (match.players.Contains(Name))
-            //    {
-            //        return match.players;
-                    
-            //    }
-            //}
-            
-           return "not found";
-        }
+        
         [AllowAnonymous]
         [Route("GetAllMatchs")]
-        public IEnumerable<MatchDTO> GetAllMatchs()
+        public IEnumerable<MatchDTO> GetAllMatchs(string year,string month)
         {
-            List<Match> matches = db.matchs.Include(m => m.players).ToList();
-           
-            List <MatchDTO> dtos = new List<MatchDTO>();
+            int mon = Int32.Parse(month);
+            int year1 = Int32.Parse(year);
+            List<Match> matches = db.matchs.Where(m =>m.year == year1 && m.month == mon)
+                .OrderBy(m => m.day).Include(m => m.players).ToList();
+
+            List<MatchDTO> dtos = new List<MatchDTO>();
             //do not want to pass the whole user object   
-            foreach( Match m in matches)
+            foreach (Match m in matches)
             {
                 MatchDTO dto = new MatchDTO();
                 dto.day = m.day;
-                dto.month = m.month ;
-                dto.level = m.skillLevel ;
-                dto.Captain = m.captain ;
+                dto.month = m.month;
+                dto.level = m.skillLevel;
+                dto.Captain = m.captain;
                 dto.players = new List<String>();
                 for (int i = 0; i < m.players.Count; i++)
                 {
-          
+
                     dto.players.Add(m.players[i].Email);
-          //          dto.players = dto.players + ",";
+                    //          dto.players = dto.players + ",";
                 }
                 dtos.Add(dto);
-              
+
             };
-            return  dtos;
-            
+            return dtos;
+
         }
+       
         [AllowAnonymous]
         [Route("freezedatabase")]
         [HttpPost]
         public IHttpActionResult freezedatabase(string state)
         {
             ApplicationUser user = db.Users.Where(u => u.Email == "jmcfet@icloud.com").SingleOrDefault();
-            user.bFreezeDB = user.bFreezeDB == 1 ? 0 : 1 ;
-          
+            user.bFreezeDB = user.bFreezeDB == 1 ? 0 : 1;
+
             db.SaveChanges();
             return Ok();
         }
-       
+        [AllowAnonymous]
         [Route("isfreezedatabase")]
         [HttpGet]
         public IHttpActionResult isfreezedatabase()
@@ -389,7 +451,7 @@ namespace flutterBackEnd.Controllers
             ApplicationUser user = db.Users.Where(u => u.Email == "jmcfet@icloud.com").SingleOrDefault();
             if (user.bFreezeDB == 0)
                 return Ok();
-            
+
             return NotFound();
         }
         // GET api/Account/Login
@@ -407,21 +469,23 @@ namespace flutterBackEnd.Controllers
 
             try
             {
-               
 
-                List<ApplicationUser> users =  UserManager.Users.ToList();
-                foreach(ApplicationUser user in users)
+
+                List<ApplicationUser> users = UserManager.Users.ToList();
+                foreach (ApplicationUser user in users)
                 {
                     dto = new userdto()
                     {
+                        Name = user.memberName,
                         level = user.skillLevel,
                         timesCaptain = user.timesCaptain,
+                        notused = user.AccessFailedCount,
                         Email = user.Email,
-                        PhoneNumber = user.PhoneNumber
+                        phonenum = user.PhoneNumber
                     };
                     info.Add(dto);
                 }
-                
+
 
 
             }
@@ -434,34 +498,33 @@ namespace flutterBackEnd.Controllers
 
 
         }
-        // GET api/Account/Login
        
-        [Route("GetUser")]
-        public userdto GetUser(string email)
+
+        [Route("GetUserbyUserID")]
+        public userdto GetUserbyUserID(string userid)
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    InvalidModelStateResult test = BadRequest(ModelState);
-            //    return BadRequest(ModelState);
-            //}
+            //highjacked the UserName field as the userid so the user can login by userid
             userdto dto = null;
-           
+
             try
             {
 
 
-                ApplicationUser user = db.Users.Where(u => u.UserName == email).SingleOrDefault();
-              
+                ApplicationUser user = db.Users.Where(u => u.UserName == userid).SingleOrDefault();
+
                 dto = new userdto()
                 {
                     level = user.skillLevel,
                     timesCaptain = user.timesCaptain,
-                    Name = user.UserName,
+                    notused = user.AccessFailedCount,
+                    userid = user.UserName,
+                    Name = user.memberName,
                     isFrozen = user.bFreezeDB,
-                    Email = user.Email
+                    Email = user.Email,
+                    phonenum = user.PhoneNumber
                 };
-                   
-            
+
+
             }
             catch (Exception e)
             {
@@ -476,18 +539,19 @@ namespace flutterBackEnd.Controllers
         [Route("zeroCaptainCounts")]
         public IHttpActionResult zeroCaptainCounts()
         {
-            List<ApplicationUser> users = UserManager.Users.ToList();
+            List<ApplicationUser> users = db.Users.ToList();
             foreach (ApplicationUser user in users)
             {
                 user.timesCaptain = 0;
+                user.AccessFailedCount = 0;
             }
             db.SaveChanges();
             return Ok();
         }
-       
 
-    [Route("GetUserInfoforMonth")]
-        public List<MatchDTO> GetUserInfoforMonth(String email,int month)
+
+        [Route("GetMatchesforMonth")]
+        public List<MatchDTO> GetMatchesforMonth(String email, int month,int year)
         {
             //if (!ModelState.IsValid)
             //{
@@ -496,23 +560,23 @@ namespace flutterBackEnd.Controllers
             //}
             userdto dto = null;
             List<MatchDTO> dtos = new List<MatchDTO>();
-            
+
             try
             {
 
 
                 ApplicationUser user = db.Users.Include(m => m.Matches).Where(u => u.Email == email).SingleOrDefault();
-          //      dto = new userdto()
-           //     {
-           //         level = user.skillLevel,
-          //          timesCaptain = user.timesCaptain,
-          //          Name = user.UserName,
-          //          Email = user.Email
-         //       };
-             //   dto.matchs = new List<MatchDTO>();
+                //      dto = new userdto()
+                //     {
+                //         level = user.skillLevel,
+                //          timesCaptain = user.timesCaptain,
+                //          Name = user.UserName,
+                //          Email = user.Email
+                //       };
+                //   dto.matchs = new List<MatchDTO>();
                 foreach (Match match in user.Matches)
                 {
-                    if (match.month != month)
+                    if (match.month != month || match.year != year)
                         continue;
                     MatchDTO matchdto = new MatchDTO();
                     matchdto.day = match.day;
@@ -522,7 +586,7 @@ namespace flutterBackEnd.Controllers
                     matchdto.players = new List<String>();
                     for (int i = 0; i < match.players.Count; i++)
                     {
-          //              matchdto.players = matchdto.players + match.players[i].Email + ',';
+                        //              matchdto.players = matchdto.players + match.players[i].Email + ',';
                         matchdto.players.Add(match.players[i].Email);
                     }
                     dtos.Add(matchdto);
@@ -581,7 +645,18 @@ namespace flutterBackEnd.Controllers
 
             return logins;
         }
-
+        [AllowAnonymous]
+        [Route("getallmembers")]
+        public async Task<String> getallmembers()
+        {
+            String all = " ";
+            List<ClubMember> members = db.members.ToList(); ;
+            foreach (ClubMember m in members)
+            {
+                all = all + m.Name + ',';
+            }
+            return all;
+        }
         // POST api/Account/Register
         [AllowAnonymous]
         [Route("Register")]
@@ -594,7 +669,7 @@ namespace flutterBackEnd.Controllers
             ClubMember member = db.members.Where(m => m.Name == model.Email).SingleOrDefault();
             if (member == null)
                 return NotFound();
-            var user = new ApplicationUser() { UserName = model.UserID, Email = model.Email, memberName = model.Name  };
+            var user = new ApplicationUser() { UserName = model.UserID, Email = model.Email,PhoneNumber=model.phonenum, memberName = model.Name  };
             
             IdentityResult result = await UserManager.CreateAsync(user, model.Password );
 
@@ -605,6 +680,8 @@ namespace flutterBackEnd.Controllers
 
             return Ok();
         }
+
+       
         [AllowAnonymous]
         [Route("Matches")]
         public  IHttpActionResult Matches(List<MatchDTO> matches)
@@ -613,37 +690,117 @@ namespace flutterBackEnd.Controllers
             //{
             //    return BadRequest(ModelState);
             //}
+
+         
            
-            foreach(MatchDTO dto in matches)
+            foreach (MatchDTO dto in matches)
             {
+                if (dto.level == 99)  //left overs
+                {
+                    for (int i = 0; i < dto.players.Count; i++)
+                    {
+                        string member = dto.players[i];
+                        ApplicationUser user = db.Users.Where(u1 => u1.memberName == member).SingleOrDefault();
+                        user.AccessFailedCount += 1;
+                    }
+                    continue;
+                }
+
+
                 Match m = new Match(
                      
                     );
                 m.day = dto.day;
                 m.month = dto.month;
+                m.year = dto.year;
                 m.skillLevel = dto.level;
                 m.captain = dto.Captain;
                 m.players = new List<ApplicationUser>();
                 if (m.captain != "not")
                 {
-                    ApplicationUser u = db.Users.Where(u1 => u1.UserName == m.captain).SingleOrDefault();
+                    ApplicationUser u = db.Users.Where(u1 => u1.memberName == m.captain).SingleOrDefault();
                     u.timesCaptain += 1;
                 }
 
                 for (int i = 0; i < dto.players.Count; i++)
                 {
-                    string name = dto.players[i];
-                    ApplicationUser user = db.Users.Where(u1 => u1.UserName == name).SingleOrDefault();
+                    string member = dto.players[i];
+                    ApplicationUser user = db.Users.Where(u1 => u1.memberName == member).SingleOrDefault();
                     m.players.Add(user);
+              
                 }
                    
                      
                db.matchs.Add(m);
             
             }
-          
-            db.SaveChanges();    
+            /*
+            foreach(BookedDatesDTO avail in available)
+            {
+                //if the user in available list for the day is not in the matched list then mark as avaible
+                ApplicationUser u = Matched.Where(m => m.Email == avail.user.Email).SingleOrDefault();
+                if (u == null)
+                {
+                    ApplicationUser user = db.Users.Where(us => us.Email == avail.user.Email).SingleOrDefault();
+                    user.AccessFailedCount += 1;
+                }
+            }
+
+            */
+           db.SaveChanges();    
             return Ok();
+        }
+        [AllowAnonymous]
+        [HttpGet]
+        [Route("forgotpassword")]
+        public async Task<IHttpActionResult> forgotpassword(String email,String password)
+        {
+            string token;
+            var user = await UserManager.FindByEmailAsync(email);
+            //       if (user == null)
+            //           return RedirectToAction(nameof(ForgotPasswordConfirmation));
+            try
+            {
+                 token = await UserManager.GeneratePasswordResetTokenAsync(user.Id);
+          //this is a more secure to allow password changes but save for later and just do it directly
+         //       var link = this.Url.Link("Default", new { Controller = "account", Action = "ResetPassword", param1 = token, param2 = "somestring" });
+          //      SendEmailPasswordReset("jmcfet@icloud.com",link);
+                var resetPassResult = await UserManager.ResetPasswordAsync(user.Id, token, password);
+            }
+            catch(Exception e)
+            {
+                var text = e.Message;
+                
+            }
+            return Ok();
+        }
+
+        public bool SendEmailPasswordReset(string userEmail, string link)
+        {
+            MailMessage mailMessage = new MailMessage();
+            mailMessage.From = new MailAddress("care@lrctennis.com");
+            mailMessage.To.Add(new MailAddress(userEmail));
+
+            mailMessage.Subject = "Password Reset";
+            mailMessage.IsBodyHtml = true;
+            mailMessage.Body = link;
+
+            SmtpClient client = new SmtpClient("smtp.gmail.com", 587);
+            client.Credentials = new System.Net.NetworkCredential("jrmcfet@gmail.com", "2729Deacon");
+            //   client.Host = "smtpout.secureserver.net";
+            client.DeliveryMethod = SmtpDeliveryMethod.Network;
+            client.EnableSsl = true;
+
+            try
+            {
+                client.Send(mailMessage);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // log exception
+            }
+            return false;
         }
 
         // POST api/Account/RegisterExternal
@@ -797,14 +954,17 @@ namespace flutterBackEnd.Controllers
 
         #endregion
     }
+    
     public class userdto
     {
         public string Email { get; set; }
         public int isFrozen { get; set; }
         public int level { get; set; }
+        public int notused { get; set; }
         public String Name { get; set; }
+        public String userid { get; set; }
         public int timesCaptain { get; set; }
-        public String PhoneNumber { get; set; }
+        public String phonenum { get; set; }
 
         public List<MatchDTO> matchs { get; set; }
 

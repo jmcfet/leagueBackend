@@ -7,13 +7,13 @@ namespace flutterBackEnd.Migrations
     using System.Resources;
     
     [GeneratedCode("EntityFramework.Migrations", "6.2.0-61023")]
-    public sealed partial class restore : IMigrationMetadata
+    public sealed partial class addyear : IMigrationMetadata
     {
-        private readonly ResourceManager Resources = new ResourceManager(typeof(restore));
+        private readonly ResourceManager Resources = new ResourceManager(typeof(addyear));
         
         string IMigrationMetadata.Id
         {
-            get { return "202104080231342_restore"; }
+            get { return "202203122223313_addyear"; }
         }
         
         string IMigrationMetadata.Source

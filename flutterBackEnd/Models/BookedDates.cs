@@ -10,7 +10,7 @@ namespace flutterBackEnd.Models
         public int id { get; set; }
         //   public string Name { get; set; }
         public int month { get; set; }
-        //    public int level { get; set; }
+        public int year { get; set; }
         //    public bool isCaptain { get; set; }
         //     public int numTimesCaptain { get; set; }
         public virtual ApplicationUser user { get; set; }

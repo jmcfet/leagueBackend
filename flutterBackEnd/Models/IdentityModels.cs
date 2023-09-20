@@ -17,6 +17,7 @@ namespace flutterBackEnd.Models
         public string  memberName { get; set; }
         public virtual List<BookedDates> bookedDates { get; set; }
         public virtual List<Match> Matches { get; set; }
+        public string MatchsPerUser { get; set; }
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager, string authenticationType)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType

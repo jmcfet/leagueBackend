@@ -8,22 +8,19 @@ namespace flutterBackEnd.Models
     public class BookedDatesDTO
     {
         public int id { get; set; }
-        public string Name { get; set; }
+        public Controllers.userdto user { get; set; }
         public int month { get; set; }
-        public int level { get; set; }
+        public int year { get; set; }
         public bool isCaptain { get; set; }
-        public int numTimesCaptain { get; set; }
-       
+           
         public string status { get; set; }
         public BookedDatesDTO() { }
-        public BookedDatesDTO(int id,String Name,int month,int level,bool isCaptain,int numTimesCaptain,String status)
+        public BookedDatesDTO(int id,int month,int year,bool isCaptain,String status)
         {
             this.id = id;
-            this.Name = Name;
             this.isCaptain = isCaptain;
-            this.level = level;
-            this.numTimesCaptain = numTimesCaptain;
             this.status = status;
+            this.year = year;
             this.month = month;
         }
     }

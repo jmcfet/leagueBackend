@@ -18,7 +18,7 @@
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
     <Use64BitIISExpress />
-    <IISExpressSSLPort />
+    <IISExpressSSLPort>44340</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -45,6 +45,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.10.0, Culture=neutral, PublicKeyToken=0e99375e54769942, processorArchitecture=MSIL">
+      <HintPath>..\packages\Portable.BouncyCastle.1.8.10\lib\net40\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="MailKit, Version=2.11.0.0, Culture=neutral, PublicKeyToken=4e064fe7c44a8f1b, processorArchitecture=MSIL">
+      <HintPath>..\packages\MailKit.2.11.1\lib\net46\MailKit.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.2.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
     </Reference>
@@ -76,9 +82,12 @@
     <Reference Include="Microsoft.Owin.Cors, Version=4.1.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.Cors.4.1.1\lib\net45\Microsoft.Owin.Cors.dll</HintPath>
     </Reference>
+    <Reference Include="MimeKit, Version=2.11.0.0, Culture=neutral, PublicKeyToken=bede1c8a46c66814, processorArchitecture=MSIL">
+      <HintPath>..\packages\MimeKit.2.11.0\lib\net46\MimeKit.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
-      <HintPath>..\packages\System.Buffers.4.5.0\lib\netstandard2.0\System.Buffers.dll</HintPath>
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.ComponentModel.Annotations.4.5.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
@@ -98,6 +107,7 @@
     <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.4.5.1\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
     </Reference>
+    <Reference Include="System.Security" />
     <Reference Include="System.Text.Encodings.Web, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Text.Encodings.Web.4.5.0\lib\netstandard2.0\System.Text.Encodings.Web.dll</HintPath>
     </Reference>
@@ -287,81 +297,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Migrations\202103122004008_match.cs" />
-    <Compile Include="Migrations\202103122004008_match.Designer.cs">
-      <DependentUpon>202103122004008_match.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202103171744243_changeusertostring.cs" />
-    <Compile Include="Migrations\202103171744243_changeusertostring.Designer.cs">
-      <DependentUpon>202103171744243_changeusertostring.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202103171830194_changeusertostring1.cs" />
-    <Compile Include="Migrations\202103171830194_changeusertostring1.Designer.cs">
-      <DependentUpon>202103171830194_changeusertostring1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202103242241559_addIsCaptain.cs" />
-    <Compile Include="Migrations\202103242241559_addIsCaptain.Designer.cs">
-      <DependentUpon>202103242241559_addIsCaptain.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202103242246363_numTimesCaptainisint.cs" />
-    <Compile Include="Migrations\202103242246363_numTimesCaptainisint.Designer.cs">
-      <DependentUpon>202103242246363_numTimesCaptainisint.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202103251323123_addlevel.cs" />
-    <Compile Include="Migrations\202103251323123_addlevel.Designer.cs">
-      <DependentUpon>202103251323123_addlevel.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202103311918429_addusertobookeddates.cs" />
-    <Compile Include="Migrations\202103311918429_addusertobookeddates.Designer.cs">
-      <DependentUpon>202103311918429_addusertobookeddates.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202104011501529_onetomany.cs" />
-    <Compile Include="Migrations\202104011501529_onetomany.Designer.cs">
-      <DependentUpon>202104011501529_onetomany.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202104011516129_addbookeddatesuserasvirtual.cs" />
-    <Compile Include="Migrations\202104011516129_addbookeddatesuserasvirtual.Designer.cs">
-      <DependentUpon>202104011516129_addbookeddatesuserasvirtual.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202104012040289_addclubmember.cs" />
-    <Compile Include="Migrations\202104012040289_addclubmember.Designer.cs">
-      <DependentUpon>202104012040289_addclubmember.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202104021816512_addmanytomanymatchtouser.cs" />
-    <Compile Include="Migrations\202104021816512_addmanytomanymatchtouser.Designer.cs">
-      <DependentUpon>202104021816512_addmanytomanymatchtouser.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202104072011408_onemanyusertostatusmonth.cs" />
-    <Compile Include="Migrations\202104072011408_onemanyusertostatusmonth.Designer.cs">
-      <DependentUpon>202104072011408_onemanyusertostatusmonth.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202104072031176_onemanyusertostatusmonthfix.cs" />
-    <Compile Include="Migrations\202104072031176_onemanyusertostatusmonthfix.Designer.cs">
-      <DependentUpon>202104072031176_onemanyusertostatusmonthfix.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202104072246479_restorestatusfordays.cs" />
-    <Compile Include="Migrations\202104072246479_restorestatusfordays.Designer.cs">
-      <DependentUpon>202104072246479_restorestatusfordays.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202104080205044_changebookdatesid.cs" />
-    <Compile Include="Migrations\202104080205044_changebookdatesid.Designer.cs">
-      <DependentUpon>202104080205044_changebookdatesid.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202104080231342_restore.cs" />
-    <Compile Include="Migrations\202104080231342_restore.Designer.cs">
-      <DependentUpon>202104080231342_restore.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202104081625162_addfrezzecolumn.cs" />
-    <Compile Include="Migrations\202104081625162_addfrezzecolumn.Designer.cs">
-      <DependentUpon>202104081625162_addfrezzecolumn.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202104081632529_addfrezzecolumn1.cs" />
-    <Compile Include="Migrations\202104081632529_addfrezzecolumn1.Designer.cs">
-      <DependentUpon>202104081632529_addfrezzecolumn1.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Migrations\202104241457257_adduserid.cs" />
-    <Compile Include="Migrations\202104241457257_adduserid.Designer.cs">
-      <DependentUpon>202104241457257_adduserid.cs</DependentUpon>
+    <Compile Include="Migrations\202203122223313_addyear.cs" />
+    <Compile Include="Migrations\202203122223313_addyear.Designer.cs">
+      <DependentUpon>202203122223313_addyear.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountBindingModels.cs" />
@@ -472,62 +410,8 @@
     <Content Include="Scripts\jquery-3.3.1.min.map" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202103122004008_match.resx">
-      <DependentUpon>202103122004008_match.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202103171744243_changeusertostring.resx">
-      <DependentUpon>202103171744243_changeusertostring.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202103171830194_changeusertostring1.resx">
-      <DependentUpon>202103171830194_changeusertostring1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202103242241559_addIsCaptain.resx">
-      <DependentUpon>202103242241559_addIsCaptain.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202103242246363_numTimesCaptainisint.resx">
-      <DependentUpon>202103242246363_numTimesCaptainisint.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202103251323123_addlevel.resx">
-      <DependentUpon>202103251323123_addlevel.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202103311918429_addusertobookeddates.resx">
-      <DependentUpon>202103311918429_addusertobookeddates.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202104011501529_onetomany.resx">
-      <DependentUpon>202104011501529_onetomany.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202104011516129_addbookeddatesuserasvirtual.resx">
-      <DependentUpon>202104011516129_addbookeddatesuserasvirtual.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202104012040289_addclubmember.resx">
-      <DependentUpon>202104012040289_addclubmember.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202104021816512_addmanytomanymatchtouser.resx">
-      <DependentUpon>202104021816512_addmanytomanymatchtouser.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202104072011408_onemanyusertostatusmonth.resx">
-      <DependentUpon>202104072011408_onemanyusertostatusmonth.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202104072031176_onemanyusertostatusmonthfix.resx">
-      <DependentUpon>202104072031176_onemanyusertostatusmonthfix.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202104072246479_restorestatusfordays.resx">
-      <DependentUpon>202104072246479_restorestatusfordays.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202104080205044_changebookdatesid.resx">
-      <DependentUpon>202104080205044_changebookdatesid.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202104080231342_restore.resx">
-      <DependentUpon>202104080231342_restore.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202104081625162_addfrezzecolumn.resx">
-      <DependentUpon>202104081625162_addfrezzecolumn.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202104081632529_addfrezzecolumn1.resx">
-      <DependentUpon>202104081632529_addfrezzecolumn1.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\202104241457257_adduserid.resx">
-      <DependentUpon>202104241457257_adduserid.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202203122223313_addyear.resx">
+      <DependentUpon>202203122223313_addyear.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
